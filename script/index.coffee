@@ -1131,37 +1131,26 @@ api.wrap = (user, main=true) ->
       # Tally each task
       todoTally = 0
       user.party.quest.progress.down ?= 0
-      user.todos.concat(user.dailys).forEach (task) ->
-        return unless task
+      dockPoints = (tid)->user.ops.score {params:{id:tid, direction:'down'}, query:{cron:true}}
 
-        return if user.stats.buffs.stealth && user.stats.buffs.stealth-- # User "evades" a certain number of tasks
+      _.each user.dailys, (task) ->
+        evade = user.stats.buffs.stealth && user.stats.buffs.stealth-- # User "evades" a certain number of tasks
+        if !task.completed and api.shouldDo(moment(now).subtract('days',1), task.repeat, user.preferences) and !evade
+          perfect = false
+          user.party.quest.progress.down += docPoints()
+        (task.history ?= []).push({ date: +new Date, value: task.value })
+        task.completed = false
+        _.each task.checklist, ((i)->i.completed=false;true)
 
-        # Deduct experience for missed Daily tasks, but not for Todos (just increase todo's value)
-        unless task.completed
-          dockPoints = ->user.ops.score {params:{id:task.id, direction:'down'}, query:{cron:true}}
-          switch task.type
-            when 'todo' then dockPoints()
-            when 'daily'
-              if task.repeat and api.shouldDo(moment(now).subtract('days',1), task.repeat, user.preferences)
-                perfect = false
-                user.party.quest.progress.down += docPoints()
+      _.each user.todos, (task) ->
+        dockPoints() unless task.completed
+        todoTally += = if (task.completed) then Math.abs(task.value) else task.value
 
-        switch task.type
-          when 'daily'
-            (task.history ?= []).push({ date: +new Date, value: task.value })
-            task.completed = false
-            _.each task.checklist, ((i)->i.completed=false;true)
-          when 'todo'
-            #get updated value
-            absVal = if (task.completed) then Math.abs(task.value) else task.value
-            todoTally += absVal
-
-      user.habits.forEach (task) -> # slowly reset 'onlies' value to 0
+      _.each user.habits, (task) -> # slowly reset 'onlies' value to 0
         if task.up is false or task.down is false
-          if Math.abs(task.value) < 0.1
-            task.value = 0
-          else
-            task.value = task.value / 2
+          task.value =
+            if Math.abs(task.value) < 0.1 then 0
+            else task.value / 2
 
       # Finished tallying
       ((user.history ?= {}).todos ?= []).push { date: now, value: todoTally }
