@@ -576,6 +576,44 @@ api.quests =
       gp: 25
       exp: 125
 
+  #TODO vice1
+
+  vice2:
+    text: "Find the Lair of the Wyrm"
+    notes: "Confident in yourselves and your ability to withstand the wyrm's influence, your party makes it's way to Mt. Habitica. You approach the entrance to the mountain's caverns and pause. Swells of shadows, almost like fog, wisp out from the opening. It is near impossible to see anything in front of you. The light from your lanterns seem to end abruptly where the shadows begin. It is said that only magical light can pierce the dragon's infernal haze. If you can find enough light crystals, you could make your way to the dragon."
+    value: 4
+    previous: 'vice1'
+    collect:
+      lightCrystal: text: 'Light Crystal', count: 45
+    drop:
+      items: [
+        #{type: 'quests', key: 'vice3', text: "Boss Scroll"}
+      ]
+      gp: 20
+      exp: 75
+
+  vice3:
+    text: "Vice Awakens"
+    notes: "After much effort, your party has discovered Vice's lair. The hulking monster eyes your party with distaste. As shadows swirl around you, a voice whispers through your head, \"More foolish citizens of Habitica come to stop me? Cute. You'd have been wise not to come.\" The scaly titan rears back its head and prepares to attack. This is your chance! Give it everything you've got and defeat Vice once and for all!"
+    completion: "The shadows dissipate from the cavern and a steely silence falls. My word, you've done it! You have defeated Vice! You and your party may finally breath a sigh of relief. Enjoy your victory, brave Habiteers, but take the lessons you've learned from battling Vice and move forward. There are still habits to be done and potentially worse evils to conquer!"
+    previous: 'vice2'
+    value: 4
+    lvl: 40
+    boss:
+      name: "Vice, the Shadow Wyrm"
+      hp: 1500
+      str: 3
+    drop:
+      items: [
+        {type: 'gear', key: "weapon_special_2", text: "Stephen Weber's Shaft of the Dragon"}
+        {type: 'eggs', key: 'Dragon', text: "Dragon (Egg)"}
+        {type: 'eggs', key: 'Dragon', text: "Dragon (Egg)"}
+        {type: 'hatchingPotions', key: 'Shade', text: "Shade Hatching Potion"}
+        {type: 'hatchingPotions', key: 'Shade', text: "Shade Hatching Potion"}
+      ]
+      gp: 100
+      exp: 300
+
 
 _.each api.quests, (v,key) ->
   _.defaults v, {key}
